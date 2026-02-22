@@ -1,0 +1,16 @@
+{
+    "name": "Acadence",
+    "short_name": "Acadence",
+    "description": "Academic Strategy Engine — Track attendance, optimize your schedule",
+    "start_url": "/home",
+    "display": "standalone",
+    "background_color": "#0B1F2F",
+    "theme_color": "#0B1F2F",
+    "icons": [
+        {
+            "src": "/brand/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}

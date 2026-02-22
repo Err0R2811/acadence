@@ -1,0 +1,222 @@
+openapi: "3.1.0"
+info:
+  title: Attendance Tracker API
+  version: "1.0.0"
+  description: |
+    REST API for the Attendance Tracker application.
+    Calculate attendance percentages, manage student profiles,
+    and track calculation history.
+  contact:
+    name: Attendance Tracker
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://attendance-tracker.vercel.app
+    description: Production (Vercel)
+
+paths:
+  /api/attendance/calculate:
+    post:
+      summary: Calculate attendance status
+      description: |
+        Computes current attendance percentage, determines if above/below target,
+        and calculates how many lectures are needed to reach the target (or how
+        many can be missed while staying above it).
+      operationId: calculateAttendance
+      tags: [Attendance]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalculateRequest"
+            example:
+              conducted: 100
+              attended: 80
+              target: 75
+              subjectName: "Mathematics"
+      responses:
+        "200":
+          description: Successful calculation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculateResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/attendance/history:
+    get:
+      summary: Get calculation history
+      description: Returns recent attendance calculations. Currently returns empty (client-side history). Will be backed by PostgreSQL when database is connected.
+      operationId: getHistory
+      tags: [Attendance]
+      responses:
+        "200":
+          description: List of recent calculations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CalculationResult"
+
+  /api/student:
+    post:
+      summary: Create a student profile
+      description: Creates a new student profile with name, semester, and default attendance target.
+      operationId: createStudent
+      tags: [Student]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentRequest"
+            example:
+              name: "Amit Verma"
+              semester: 4
+              defaultTarget: 75
+      responses:
+        "201":
+          description: Student created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    CalculateRequest:
+      type: object
+      required: [conducted, attended, target, subjectName]
+      properties:
+        conducted:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          description: Total lectures conducted
+        attended:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          description: Total lectures attended (must be ≤ conducted)
+        target:
+          type: number
+          minimum: 1
+          maximum: 100
+          description: Target attendance percentage
+        subjectName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Name of the subject
+
+    CalculateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/CalculationResult"
+
+    CalculationResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        currentPercentage:
+          type: number
+          description: Current attendance percentage
+        isAboveTarget:
+          type: boolean
+        target:
+          type: number
+        lecturesNeeded:
+          type: integer
+          description: Consecutive lectures to attend to reach target (0 if above)
+        lecturesMissable:
+          type: integer
+          description: Lectures that can be missed while staying above target (0 if below)
+        conducted:
+          type: integer
+        attended:
+          type: integer
+        subjectName:
+          type: string
+        calculatedAt:
+          type: string
+          format: date-time
+
+    CreateStudentRequest:
+      type: object
+      required: [name, semester]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        semester:
+          type: integer
+          minimum: 1
+          maximum: 12
+        defaultTarget:
+          type: number
+          minimum: 1
+          maximum: 100
+          default: 75
+
+    StudentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            semester:
+              type: integer
+            defaultTarget:
+              type: number
+            createdAt:
+              type: string
+              format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error:
+          type: string

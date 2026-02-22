@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0F2C44"/>
+      <stop offset="100%" stop-color="#081824"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Subtle inner glow -->
+  <rect x="24" y="24" width="464" height="464" rx="72" fill="none" stroke="#C6A84A" stroke-width="0.5" opacity="0.1"/>
+  <!-- Monogram centered -->
+  <g transform="translate(140, 100)" filter="url(#glow)">
+    <!-- Left vertical bar -->
+    <rect x="10" y="40" width="4" height="230" fill="#C6A84A" rx="2" opacity="0.6"/>
+    <!-- Right vertical bar -->
+    <rect x="218" y="40" width="4" height="230" fill="#C6A84A" rx="2" opacity="0.6"/>
+    <!-- A left stroke -->
+    <path d="M50 280 L116 30" stroke="#C6A84A" stroke-width="10" stroke-linecap="round"/>
+    <!-- A right stroke -->
+    <path d="M182 280 L116 30" stroke="#C6A84A" stroke-width="10" stroke-linecap="round"/>
+    <!-- A crossbar -->
+    <path d="M72 185 L160 185" stroke="#C6A84A" stroke-width="7" stroke-linecap="round"/>
+    <!-- Inner triangle -->
+    <path d="M90 170 L116 80 L142 170 Z" fill="#C6A84A" opacity="0.12"/>
+    <!-- Orbital slash -->
+    <path d="M30 90 L205 50" stroke="#C6A84A" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  </g>
+</svg>

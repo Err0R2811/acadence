@@ -1,0 +1,71 @@
+// Prisma schema for PostgreSQL
+// Run: npx prisma migrate dev --name init
+// Run: npx prisma generate
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id            String   @id @default(uuid())
+  name          String   @db.VarChar(100)
+  division      String   @db.VarChar(10)
+  defaultTarget Float    @default(75)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  records AttendanceRecord[]
+
+  @@index([division])
+  @@map("students")
+}
+
+model AttendanceRecord {
+  id                   String   @id @default(uuid())
+  studentId            String   @map("student_id")
+  subjectName          String   @map("subject_name") @db.VarChar(100)
+  totalConducted       Int      @map("total_conducted")
+  totalAttended        Int      @map("total_attended")
+  calculatedPercentage Float    @map("calculated_percentage")
+  target               Float
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([createdAt])
+  @@map("attendance_records")
+}
+
+model Division {
+  id        String           @id @default(uuid())
+  name      String           @unique @db.VarChar(10)
+  timetable TimetableEntry[]
+
+  @@map("divisions")
+}
+
+model TimetableEntry {
+  id           String @id @default(uuid())
+  divisionId   String @map("division_id")
+  subjectCode  String @map("subject_code") @db.VarChar(20)
+  subjectShort String @map("subject_short") @db.VarChar(20)
+  day          String @db.VarChar(10)
+  startTime    String @map("start_time") @db.VarChar(10)
+  endTime      String @map("end_time") @db.VarChar(10)
+  room         String @db.VarChar(20)
+  type         String @db.VarChar(10)
+  faculty      String @db.VarChar(50)
+
+  division Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+
+  @@index([divisionId])
+  @@index([subjectShort])
+  @@index([day])
+  @@map("timetable_entries")
+}
