@@ -32,12 +32,12 @@ export default function SimulationSlider() {
     const projectedPct = useMemo(() => {
         if (effectiveConducted === 0) return 100;
         return ((attended + simValue) / (effectiveConducted + simValue)) * 100;
-    }, [attended, conducted, simValue]);
+    }, [attended, effectiveConducted, simValue]);
 
     const remainingRequired = useMemo(() => {
-        const needed = computeRequiredLectures(attended + simValue, conducted + simValue, target);
+        const needed = computeRequiredLectures(attended + simValue, effectiveConducted + simValue, target);
         return Math.max(needed, 0);
-    }, [attended, conducted, simValue, target]);
+    }, [attended, effectiveConducted, simValue, target]);
 
     const targetAchieved = projectedPct >= target;
 

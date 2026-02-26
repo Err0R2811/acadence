@@ -107,9 +107,11 @@ export const useAttendanceStore = create<AttendanceState>()(
         }),
         {
             name: 'attendance-tracker-storage',
-            merge: (persistedState: any, currentState) => {
-                const merged = { ...currentState, ...persistedState };
-                if (merged.strategyMode === 'hardcore') {
+            merge: (persistedState: unknown, currentState: AttendanceState): AttendanceState => {
+                const persisted = persistedState as Partial<AttendanceState> | undefined;
+                const merged = { ...currentState, ...persisted };
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                if ((merged.strategyMode as any) === 'hardcore') {
                     merged.strategyMode = 'hard';
                 }
                 return merged;

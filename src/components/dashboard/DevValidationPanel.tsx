@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { validateFacultyMapping, type ValidationStats } from "@/lib/timetable";
 
 export function DevValidationPanel() {
-    const [stats, setStats] = useState<ValidationStats | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 
-    useEffect(() => {
+    // Use useMemo instead of useEffect to avoid setState in effect
+    const stats = useMemo<ValidationStats | null>(() => {
         // Only run in development
-        if (process.env.NODE_ENV !== "development") return;
-
-        const results = validateFacultyMapping();
-        setStats(results);
+        if (process.env.NODE_ENV !== "development") return null;
+        return validateFacultyMapping();
     }, []);
 
     // If not in development or no stats generated, do not render
