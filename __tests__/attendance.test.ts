@@ -14,8 +14,8 @@ describe('calculateAttendance', () => {
         expect(calculateAttendance(80, 100)).toBe(80);
     });
 
-    it('returns 100% when no lectures conducted', () => {
-        expect(calculateAttendance(0, 0)).toBe(100);
+    it('returns 0% when no lectures conducted', () => {
+        expect(calculateAttendance(0, 0)).toBe(0);
     });
 
     it('returns 0% when no lectures attended', () => {
@@ -54,6 +54,20 @@ describe('calculateAttendance', () => {
     it('throws on Infinity inputs', () => {
         expect(() => calculateAttendance(Infinity, 10)).toThrow(AttendanceError);
     });
+
+    it('handles noAttendance properly', () => {
+        // Conducted: 40, Attended: 30, NoAttendance: 5 => Effective: 35
+        // 30 / 35 = 85.714...
+        expect(calculateAttendance(30, 40, 5)).toBeCloseTo(85.714);
+    });
+
+    it('returns 0% when effective conducted is 0', () => {
+        expect(calculateAttendance(0, 5, 5)).toBe(0);
+    });
+
+    it('throws when noAttendance exceeds conducted', () => {
+        expect(() => calculateAttendance(5, 10, 11)).toThrow(AttendanceError);
+    });
 });
 
 // ─── lecturesNeeded ─────────────────────────────────────────────────────────
@@ -78,8 +92,8 @@ describe('lecturesNeeded', () => {
         expect(lecturesNeeded(50, 100, 75)).toBe(100);
     });
 
-    it('returns 0 when no lectures conducted', () => {
-        expect(lecturesNeeded(0, 0, 75)).toBe(0);
+    it('returns 1 when no lectures conducted and target > 0', () => {
+        expect(lecturesNeeded(0, 0, 75)).toBe(1);
     });
 
     it('returns Infinity when target is 100% and classes missed', () => {
@@ -96,6 +110,13 @@ describe('lecturesNeeded', () => {
 
     it('throws when target is 0', () => {
         expect(() => lecturesNeeded(80, 100, 0)).toThrow(AttendanceError);
+    });
+
+    it('handles noAttendance mathematically correctly', () => {
+        // Conducted: 40, Attended: 30, NoAttendance: 5 => Target: 90%
+        // Effective: 35, Attended: 30
+        // (30 + x) / (35 + x) >= 0.9 => 30 + x >= 31.5 + 0.9x => 0.1x >= 1.5 => x >= 15
+        expect(lecturesNeeded(30, 40, 90, 5)).toBe(15);
     });
 });
 
@@ -124,6 +145,13 @@ describe('lecturesMissable', () => {
         // 95 / (100 + x) >= 0.50 → x <= 90
         expect(lecturesMissable(95, 100, 50)).toBe(90);
     });
+
+    it('handles noAttendance properly', () => {
+        // Conducted: 40, Attended: 30, NoAttendance: 5 => Target: 75%
+        // Effective: 35, Attended: 30
+        // 30 / (35 + x) >= 0.75 => 30 >= 26.25 + 0.75x => 3.75 >= 0.75x => x <= 5
+        expect(lecturesMissable(30, 40, 75, 5)).toBe(5);
+    });
 });
 
 // ─── fullCalculation ────────────────────────────────────────────────────────
@@ -148,5 +176,14 @@ describe('fullCalculation', () => {
     it('rounds percentage to 2 decimal places', () => {
         const result = fullCalculation(33, 40, 75);
         expect(result.currentPercentage).toBe(82.5);
+    });
+
+    it('incorporates noAttendance accurately into the full result', () => {
+        const result = fullCalculation(30, 40, 80, 5);
+        expect(result.currentPercentage).toBe(85.71); // 30/35
+        expect(result.isAboveTarget).toBe(true);
+        expect(result.lecturesNeeded).toBe(0);
+        expect(result.lecturesMissable).toBe(2); // 30 / (35+2) = 0.8108 => 30/(35+3) = 0.789
+        expect(result.noAttendance).toBe(5);
     });
 });

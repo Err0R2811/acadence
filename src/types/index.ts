@@ -16,6 +16,7 @@ export type NavTab = 'home' | 'timetable' | 'history' | 'settings';
 export interface CalculationInput {
   conducted: number;
   attended: number;
+  noAttendance?: number;
   target: number;
 }
 
@@ -29,6 +30,7 @@ export interface CalculationResult {
   lecturesMissable: number;
   conducted: number;
   attended: number;
+  noAttendance?: number;
   calculatedAt: string;
 }
 

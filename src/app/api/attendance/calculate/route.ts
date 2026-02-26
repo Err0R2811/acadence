@@ -19,9 +19,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { conducted, attended, target } = parsed.data;
+        const { conducted, attended, target, noAttendance } = parsed.data;
 
-        const result = fullCalculation(attended, conducted, target);
+        const result = fullCalculation(attended, conducted, target, noAttendance);
 
         return NextResponse.json({
             success: true,

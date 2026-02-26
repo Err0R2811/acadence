@@ -11,13 +11,19 @@ export const calculateSchema = z.object({
         .int('Must be a whole number')
         .min(0, 'Cannot be negative')
         .max(10000, 'Exceeds maximum allowed'),
+    noAttendance: z
+        .number()
+        .int('Must be a whole number')
+        .min(0, 'Cannot be negative')
+        .max(10000, 'Exceeds maximum allowed')
+        .optional(),
     target: z
         .number()
         .min(1, 'Target must be at least 1%')
         .max(100, 'Target cannot exceed 100%'),
 }).refine(
-    (data) => data.attended <= data.conducted,
-    { message: 'Attended cannot exceed conducted', path: ['attended'] }
+    (data) => data.attended <= (data.conducted - (data.noAttendance ?? 0)),
+    { message: 'Attended cannot exceed effective conducted (conducted - no attendance)', path: ['attended'] }
 );
 
 export const studentSchema = z.object({

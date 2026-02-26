@@ -31,6 +31,7 @@ model AttendanceRecord {
   subjectName          String   @map("subject_name") @db.VarChar(100)
   totalConducted       Int      @map("total_conducted")
   totalAttended        Int      @map("total_attended")
+  noAttendance         Int      @default(0) @map("no_attendance")
   calculatedPercentage Float    @map("calculated_percentage")
   target               Float
   createdAt            DateTime @default(now()) @map("created_at")

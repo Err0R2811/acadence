@@ -71,6 +71,7 @@ export default function RecentCalculations() {
                             style={{ color: 'var(--text-primary)' }}
                         >
                             {currentResult.attended}/{currentResult.conducted} lectures
+                            {currentResult.noAttendance ? ` (No Att: ${currentResult.noAttendance})` : ''}
                         </p>
                         <p
                             className="text-xs mt-0.5"

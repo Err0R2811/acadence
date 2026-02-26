@@ -7,10 +7,12 @@ export default function CalculatorCard() {
     const {
         conducted,
         attended,
+        noAttendance,
         target,
         useDefaultTarget,
         setConducted,
         setAttended,
+        setNoAttendance,
         setTarget,
         setUseDefaultTarget,
         calculate,
@@ -80,6 +82,29 @@ export default function CalculatorCard() {
                         inputMode="numeric"
                     />
                 </div>
+            </div>
+
+            {/* No Attendance */}
+            <div className="mb-4">
+                <label
+                    className="block text-xs font-medium mb-1.5 uppercase tracking-wider"
+                    style={{ color: 'var(--text-muted)' }}
+                >
+                    Lectures Without Attendance Taken
+                </label>
+                <input
+                    type="number"
+                    className="input-field"
+                    placeholder="0"
+                    value={noAttendance}
+                    onChange={(e) => setNoAttendance(e.target.value)}
+                    min={0}
+                    max={10000}
+                    inputMode="numeric"
+                />
+                <p className="text-[10px] mt-1.5 opacity-70" style={{ color: 'var(--text-muted)' }}>
+                    These lectures will not be counted in your attendance percentage.
+                </p>
             </div>
 
             {/* Target Toggle */}

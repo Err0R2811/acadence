@@ -14,6 +14,7 @@ interface AttendanceState {
     useDefaultTarget: boolean;
     conducted: string;
     attended: string;
+    noAttendance: string;
     strategyMode: StrategyMode;
 
     // Result (ephemeral — not persisted)
@@ -25,6 +26,7 @@ interface AttendanceState {
     setUseDefaultTarget: (use: boolean) => void;
     setConducted: (value: string) => void;
     setAttended: (value: string) => void;
+    setNoAttendance: (value: string) => void;
     setStrategyMode: (mode: StrategyMode) => void;
     calculate: () => { success: boolean; error?: string };
     clearResult: () => void;
@@ -40,6 +42,7 @@ export const useAttendanceStore = create<AttendanceState>()(
             useDefaultTarget: true,
             conducted: '',
             attended: '',
+            noAttendance: '',
             strategyMode: 'medium' as StrategyMode,
             currentResult: null,
 
@@ -54,29 +57,36 @@ export const useAttendanceStore = create<AttendanceState>()(
 
             setAttended: (value) => set({ attended: value }),
 
+            setNoAttendance: (value) => set({ noAttendance: value }),
+
             setStrategyMode: (mode) => set({ strategyMode: mode }),
 
             calculate: () => {
-                const { conducted, attended, target } = get();
+                const { conducted, attended, noAttendance, target } = get();
 
                 const conductedNum = parseInt(conducted, 10);
                 const attendedNum = parseInt(attended, 10);
+                const noAttendanceNum = noAttendance === '' ? 0 : parseInt(noAttendance, 10);
 
-                if (isNaN(conductedNum) || isNaN(attendedNum)) {
+                if (isNaN(conductedNum) || isNaN(attendedNum) || isNaN(noAttendanceNum)) {
                     return { success: false, error: 'Please enter valid numbers.' };
                 }
-                if (conductedNum < 0 || attendedNum < 0) {
+                if (conductedNum < 0 || attendedNum < 0 || noAttendanceNum < 0) {
                     return { success: false, error: 'Values cannot be negative.' };
                 }
-                if (attendedNum > conductedNum) {
-                    return { success: false, error: 'Attended cannot exceed conducted.' };
+                if (noAttendanceNum > conductedNum) {
+                    return { success: false, error: 'No attendance cannot exceed conducted lectures.' };
+                }
+                const effectiveConducted = conductedNum - noAttendanceNum;
+                if (attendedNum > effectiveConducted) {
+                    return { success: false, error: 'Attended cannot exceed effective conducted lectures.' };
                 }
                 if (conductedNum === 0) {
                     return { success: false, error: 'Total lectures must be greater than 0.' };
                 }
 
                 try {
-                    const result = fullCalculation(attendedNum, conductedNum, target);
+                    const result = fullCalculation(attendedNum, conductedNum, target, noAttendanceNum);
 
                     const calculationResult: CalculationResult = {
                         ...result,
@@ -111,6 +121,7 @@ export const useAttendanceStore = create<AttendanceState>()(
                 strategyMode: state.strategyMode,
                 conducted: state.conducted,
                 attended: state.attended,
+                noAttendance: state.noAttendance,
             }),
         }
     )

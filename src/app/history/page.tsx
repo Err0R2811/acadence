@@ -87,6 +87,7 @@ export default function HistoryPage() {
                                 <div className="flex items-center justify-between">
                                     <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                                         {currentResult.attended}/{currentResult.conducted} Lectures
+                                        {currentResult.noAttendance ? ` (No Att: ${currentResult.noAttendance})` : ''}
                                     </p>
                                     <p
                                         className="text-base font-bold tabular-nums ml-3"
