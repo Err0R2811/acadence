@@ -8,26 +8,30 @@ import { STRATEGY_MODES } from '@/types';
 export default function SimulationSlider() {
     const conductedStr = useAttendanceStore((s) => s.conducted);
     const attendedStr = useAttendanceStore((s) => s.attended);
+    const noAttendanceStr = useAttendanceStore((s) => s.noAttendance);
     const target = useAttendanceStore((s) => s.target);
     const division = useAttendanceStore((s) => s.division);
     const mode = useAttendanceStore((s) => s.strategyMode);
 
     const conducted = parseInt(conductedStr, 10) || 0;
     const attended = parseInt(attendedStr, 10) || 0;
+    const noAttendance = parseInt(noAttendanceStr, 10) || 0;
+
+    const effectiveConducted = conducted - noAttendance;
 
     const plan = useMemo(() => {
         if (conducted === 0) return null;
-        return generateGlobalPlan(conducted, attended, target, division, mode);
-    }, [conducted, attended, target, division, mode]);
+        return generateGlobalPlan(conducted, attended, target, division, mode, noAttendance);
+    }, [conducted, attended, noAttendance, target, division, mode]);
 
     const maxSlots = plan?.recommendedSlots.length ?? 0;
-    const totalAvailable = Math.max(maxSlots, computeRequiredLectures(attended, conducted, target), 50);
+    const totalAvailable = Math.max(maxSlots, computeRequiredLectures(attended, effectiveConducted, target), 50);
 
     const [simValue, setSimValue] = useState(0);
 
     const projectedPct = useMemo(() => {
-        if (conducted === 0) return 100;
-        return ((attended + simValue) / (conducted + simValue)) * 100;
+        if (effectiveConducted === 0) return 100;
+        return ((attended + simValue) / (effectiveConducted + simValue)) * 100;
     }, [attended, conducted, simValue]);
 
     const remainingRequired = useMemo(() => {

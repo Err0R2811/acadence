@@ -289,18 +289,22 @@ export function generateGlobalPlan(
     attended: number,
     target: number,
     divisionId: string,
-    mode: StrategyMode
+    mode: StrategyMode,
+    noAttendance: number = 0
 ): GlobalStrategyPlan {
+    // Calculate effective conducted (excluding no attendance)
+    const effectiveConducted = conducted - noAttendance;
+    
     // 1. Compute global required lectures — CONSTANT across all modes
-    const requiredLectures = computeRequiredLectures(attended, conducted, target);
-    const safeSkipAllowance = computeSkipAllowance(attended, conducted, target);
-    const currentPct = conducted > 0 ? (attended / conducted) * 100 : 100;
+    const requiredLectures = computeRequiredLectures(attended, effectiveConducted, target);
+    const safeSkipAllowance = computeSkipAllowance(attended, effectiveConducted, target);
+    const currentPct = effectiveConducted > 0 ? (attended / effectiveConducted) * 100 : 100;
 
     // 2. Get all future timetable slots
     const availableSlots = getFutureSlots(divisionId);
 
     // 3. Pure reactive calculation for this mode
-    const stats = calculateModeStats(mode, requiredLectures, availableSlots, attended, conducted, divisionId);
+    const stats = calculateModeStats(mode, requiredLectures, availableSlots, attended, effectiveConducted, divisionId);
 
     return {
         mode,

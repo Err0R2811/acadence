@@ -13,14 +13,16 @@ export default function RecommendationCard() {
     const setMode = useAttendanceStore((s) => s.setStrategyMode);
     const conductedStr = useAttendanceStore((s) => s.conducted);
     const attendedStr = useAttendanceStore((s) => s.attended);
+    const noAttendanceStr = useAttendanceStore((s) => s.noAttendance);
 
     const conducted = parseInt(conductedStr, 10) || 0;
     const attended = parseInt(attendedStr, 10) || 0;
+    const noAttendance = parseInt(noAttendanceStr, 10) || 0;
 
     const plan = useMemo(() => {
         if (conducted === 0) return null;
-        return generateGlobalPlan(conducted, attended, target, division, mode);
-    }, [conducted, attended, target, division, mode]);
+        return generateGlobalPlan(conducted, attended, target, division, mode, noAttendance);
+    }, [conducted, attended, target, division, mode, noAttendance]);
 
     const modeInfo = STRATEGY_MODES.find((m) => m.id === mode)!;
     const summary = plan?.summary;

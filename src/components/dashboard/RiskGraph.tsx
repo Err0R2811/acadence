@@ -9,6 +9,7 @@ import type { StrategyMode } from '@/types';
 export default function RiskGraph() {
     const conductedStr = useAttendanceStore((s) => s.conducted);
     const attendedStr = useAttendanceStore((s) => s.attended);
+    const noAttendanceStr = useAttendanceStore((s) => s.noAttendance);
     const target = useAttendanceStore((s) => s.target);
     const division = useAttendanceStore((s) => s.division);
     const mode = useAttendanceStore((s) => s.strategyMode);
@@ -16,32 +17,32 @@ export default function RiskGraph() {
 
     const conducted = parseInt(conductedStr, 10) || 0;
     const attended = parseInt(attendedStr, 10) || 0;
+    const noAttendance = parseInt(noAttendanceStr, 10) || 0;
 
     const graphData = useMemo(() => {
-        if (conducted === 0) return null;
-
-        const required = computeRequiredLectures(attended, conducted, target);
-        const maxN = Math.min(Math.max(required * 1.5, 30), 200);
+        const effectiveConducted = conducted - noAttendance;
+        const required = computeRequiredLectures(attended, effectiveConducted, target);
+        
         const steps = 60;
 
         // Generate curve points
         const points: { n: number; pct: number }[] = [];
         for (let i = 0; i <= steps; i++) {
             const n = Math.round((i / steps) * maxN);
-            const pct = ((attended + n) / (conducted + n)) * 100;
+            const pct = ((attended + n) / (effectiveConducted + n)) * 100;
             points.push({ n, pct });
         }
 
         // Mode endpoints
         const modeEndpoints = (['easy', 'medium', 'hard'] as StrategyMode[]).map((m) => {
-            const plan = generateGlobalPlan(conducted, attended, target, division, m);
+            const plan = generateGlobalPlan(conducted, attended, target, division, m, noAttendance);
             const slots = plan.recommendedSlots.length;
-            const pct = ((attended + slots) / (conducted + slots)) * 100;
+            const pct = ((attended + slots) / (effectiveConducted + slots)) * 100;
             return { mode: m, n: slots, pct, info: STRATEGY_MODES.find((s) => s.id === m)! };
         });
 
         return { points, modeEndpoints, maxN, required };
-    }, [conducted, attended, target, division]);
+    }, [conducted, attended, noAttendance, target, division]);
 
     if (!graphData) return null;
 

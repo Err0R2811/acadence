@@ -55,10 +55,12 @@ export default function TimetablePage() {
     const target = useAttendanceStore((s) => s.target);
     const conductedStr = useAttendanceStore((s) => s.conducted);
     const attendedStr = useAttendanceStore((s) => s.attended);
+    const noAttendanceStr = useAttendanceStore((s) => s.noAttendance);
 
     // Parse global attendance from store
     const conducted = parseInt(conductedStr, 10) || 0;
     const attended = parseInt(attendedStr, 10) || 0;
+    const noAttendance = parseInt(noAttendanceStr, 10) || 0;
 
     // Filtering State
     const [selectedFaculties, setSelectedFaculties] = useState<string[]>([]);
@@ -81,8 +83,8 @@ export default function TimetablePage() {
     // Global strategy plan — mode is in dep array
     const plan = useMemo(() => {
         if (conducted === 0) return null;
-        return generateGlobalPlan(conducted, attended, target, division, mode);
-    }, [conducted, attended, target, division, mode]);
+        return generateGlobalPlan(conducted, attended, target, division, mode, noAttendance);
+    }, [conducted, attended, noAttendance, target, division, mode]);
 
     // Build recommended slot lookup map
     const recommendedMap = useMemo(() => {

@@ -15,6 +15,7 @@ const SPEED_LABELS: Record<StrategyMode, { emoji: string; label: string }> = {
 export default function ModeComparison() {
     const conductedStr = useAttendanceStore((s) => s.conducted);
     const attendedStr = useAttendanceStore((s) => s.attended);
+    const noAttendanceStr = useAttendanceStore((s) => s.noAttendance);
     const target = useAttendanceStore((s) => s.target);
     const division = useAttendanceStore((s) => s.division);
     const mode = useAttendanceStore((s) => s.strategyMode);
@@ -22,16 +23,18 @@ export default function ModeComparison() {
 
     const conducted = parseInt(conductedStr, 10) || 0;
     const attended = parseInt(attendedStr, 10) || 0;
+    const noAttendance = parseInt(noAttendanceStr, 10) || 0;
 
     const comparison = useMemo(() => {
         if (conducted === 0) return null;
 
-        const required = computeRequiredLectures(attended, conducted, target);
+        const effectiveConducted = conducted - noAttendance;
+        const required = computeRequiredLectures(attended, effectiveConducted, target);
         const availableSlots = getFutureSlots(division);
         const totalSlots = availableSlots.length;
 
         return (['easy', 'medium', 'hard'] as StrategyMode[]).map((m) => {
-            const stats = calculateModeStats(m, required, availableSlots, attended, conducted, division);
+            const stats = calculateModeStats(m, required, availableSlots, attended, effectiveConducted, division);
             return {
                 mode: m,
                 required,
@@ -45,7 +48,7 @@ export default function ModeComparison() {
                 totalSlots,
             };
         });
-    }, [conducted, attended, target, division]);
+    }, [conducted, attended, noAttendance, target, division]);
 
     if (!comparison) return null;
 
