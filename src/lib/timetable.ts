@@ -12,6 +12,53 @@ import {
 
 export type { ScheduleEntry, SubjectInfo };
 
+// Academic Calendar - B.Tech Even 2025-26
+export const ACADEMIC_CALENDAR = {
+    teachingEnd: new Date('2026-03-21'),
+    midSemExams: { start: new Date('2026-03-24'), end: new Date('2026-03-31') },
+    practicalExams: { start: new Date('2026-04-01'), end: new Date('2026-04-07') },
+    theoryExams: { start: new Date('2026-04-08') },
+} as const;
+
+export type AcademicPhase = 'teaching' | 'midsem' | 'practical' | 'theory' | 'completed';
+
+export function getAcademicPhase(): AcademicPhase {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const teachingEnd = new Date(ACADEMIC_CALENDAR.teachingEnd);
+    teachingEnd.setHours(0, 0, 0, 0);
+    
+    const midStart = new Date(ACADEMIC_CALENDAR.midSemExams.start);
+    midStart.setHours(0, 0, 0, 0);
+    
+    const practicalStart = new Date(ACADEMIC_CALENDAR.practicalExams.start);
+    practicalStart.setHours(0, 0, 0, 0);
+    
+    const theoryStart = new Date(ACADEMIC_CALENDAR.theoryExams.start);
+    theoryStart.setHours(0, 0, 0, 0);
+    
+    if (today < teachingEnd) return 'teaching';
+    if (today < midStart) return 'midsem';
+    if (today < practicalStart) return 'midsem';
+    if (today < theoryStart) return 'practical';
+    return 'theory';
+}
+
+export function getDaysUntilTeachingEnd(): number {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const teachingEnd = new Date(ACADEMIC_CALENDAR.teachingEnd);
+    teachingEnd.setHours(0, 0, 0, 0);
+    const diff = teachingEnd.getTime() - today.getTime();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+export function getTeachingWeeksRemaining(): number {
+    const days = getDaysUntilTeachingEnd();
+    return Math.ceil(days / 7);
+}
+
 /** Get the full weekly schedule for a division */
 export function getScheduleForDivision(divisionId: string): ScheduleEntry[] {
     return SCHEDULE_DATA[divisionId] ?? [];
@@ -128,6 +175,21 @@ export function getUpcomingLectures(
     }
 
     return upcoming;
+}
+
+/** Get lectures until teaching end date from academic calendar */
+export function getLecturesUntilTeachingEnd(
+    divisionId: string,
+    fromDay: string
+): ScheduleEntry[] {
+    const daysUntilEnd = getDaysUntilTeachingEnd();
+    if (daysUntilEnd <= 0) return [];
+    return getUpcomingLectures(divisionId, fromDay, daysUntilEnd);
+}
+
+/** Get total lecture slots remaining until teaching end */
+export function getRemainingLectureSlots(divisionId: string, fromDay: string): number {
+    return getLecturesUntilTeachingEnd(divisionId, fromDay).length;
 }
 
 /** Get unique subject shorts from a division's schedule */

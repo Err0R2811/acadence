@@ -14,7 +14,7 @@
  *   HARD:     Attend all consecutive slots until required is met, compressed into fewest days
  */
 
-import { getUpcomingLectures, getScheduleForDivision, type ScheduleEntry } from './timetable';
+import { getUpcomingLectures, getLecturesUntilTeachingEnd, getScheduleForDivision, getDaysUntilTeachingEnd, type ScheduleEntry } from './timetable';
 import { SCHEDULE_DATA } from './timetable-data';
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -126,7 +126,9 @@ export function getRiskLevel(percentage: number, target: number): 'Safe' | 'Warn
 export function getFutureSlots(divisionId: string): FutureSlot[] {
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const today = dayNames[new Date().getDay()];
-    const upcoming = getUpcomingLectures(divisionId, today, 70);
+    
+    // Use academic calendar to limit lectures to teaching end date
+    const upcoming = getLecturesUntilTeachingEnd(divisionId, today);
 
     return upcoming.map(entry => ({
         day: entry.day,
