@@ -41,6 +41,11 @@ export function getFacultyFullName(_divisionId: string, shortName: string): stri
 }
 
 /** Build a grid: day → slot → entry (or null) */
+function timeToMinutes(time: string): number {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
 export function buildTimetableGrid(
     divisionId: string
 ): Record<string, Record<string, ScheduleEntry | null>> {
@@ -65,9 +70,15 @@ export function buildTimetableGrid(
 
         // For labs spanning multiple slots (e.g., 02:30 - 04:20), 
         // find the first slot that falls within the lab time range
+        const entryStart = timeToMinutes(entry.startTime);
+        const entryEnd = timeToMinutes(entry.endTime);
+        
         for (const slot of TEACHING_SLOTS) {
-            const [slotStart, slotEnd] = slot.split(' - ');
-            if (entry.startTime <= slotStart && entry.endTime >= slotEnd) {
+            const [slotStartStr, slotEndStr] = slot.split(' - ');
+            const slotStart = timeToMinutes(slotStartStr);
+            const slotEnd = timeToMinutes(slotEndStr);
+            
+            if (entryStart <= slotStart && entryEnd >= slotEnd) {
                 grid[entry.day][slot] = entry;
                 break;
             }
