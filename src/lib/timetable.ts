@@ -41,9 +41,18 @@ export function getFacultyFullName(_divisionId: string, shortName: string): stri
 }
 
 /** Build a grid: day → slot → entry (or null) */
-function timeToMinutes(time: string): number {
+function timeToMinutes(time: string, contextStartMinutes?: number): number {
     const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
+    let mins = hours * 60 + minutes;
+    
+    // If we have context (start time), and the parsed time is less than start time,
+    // treat it as PM (add 12 hours = 720 minutes)
+    // This handles 12-hour format times like "01:15" after "12:20"
+    if (contextStartMinutes !== undefined && mins < contextStartMinutes && mins < 720) {
+        mins += 720;
+    }
+    
+    return mins;
 }
 
 export function buildTimetableGrid(
@@ -71,12 +80,12 @@ export function buildTimetableGrid(
         // For labs spanning multiple slots (e.g., 02:30 - 04:20), 
         // find the first slot that falls within the lab time range
         const entryStart = timeToMinutes(entry.startTime);
-        const entryEnd = timeToMinutes(entry.endTime);
+        const entryEnd = timeToMinutes(entry.endTime, entryStart);
         
         for (const slot of TEACHING_SLOTS) {
             const [slotStartStr, slotEndStr] = slot.split(' - ');
             const slotStart = timeToMinutes(slotStartStr);
-            const slotEnd = timeToMinutes(slotEndStr);
+            const slotEnd = timeToMinutes(slotEndStr, slotStart);
             
             if (entryStart <= slotStart && entryEnd >= slotEnd) {
                 grid[entry.day][slot] = entry;
