@@ -55,9 +55,22 @@ export function buildTimetableGrid(
     }
 
     for (const entry of schedule) {
-        const slotKey = `${entry.startTime} - ${entry.endTime}`;
-        if (grid[entry.day]?.[slotKey] !== undefined) {
-            grid[entry.day][slotKey] = entry;
+        const exactSlotKey = `${entry.startTime} - ${entry.endTime}`;
+        
+        // Try exact match first
+        if (grid[entry.day]?.[exactSlotKey] !== undefined) {
+            grid[entry.day][exactSlotKey] = entry;
+            continue;
+        }
+
+        // For labs spanning multiple slots (e.g., 02:30 - 04:20), 
+        // find the first slot that falls within the lab time range
+        for (const slot of TEACHING_SLOTS) {
+            const [slotStart, slotEnd] = slot.split(' - ');
+            if (entry.startTime <= slotStart && entry.endTime >= slotEnd) {
+                grid[entry.day][slot] = entry;
+                break;
+            }
         }
     }
 
