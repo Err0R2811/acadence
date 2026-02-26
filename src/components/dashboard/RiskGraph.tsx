@@ -20,9 +20,11 @@ export default function RiskGraph() {
     const noAttendance = parseInt(noAttendanceStr, 10) || 0;
 
     const graphData = useMemo(() => {
+        if (conducted === 0) return null;
+
         const effectiveConducted = conducted - noAttendance;
         const required = computeRequiredLectures(attended, effectiveConducted, target);
-        
+        const maxN = Math.min(Math.max(required * 1.5, 30), 200);
         const steps = 60;
 
         // Generate curve points
