@@ -14,7 +14,7 @@ export type { ScheduleEntry, SubjectInfo };
 
 // Academic Calendar - B.Tech Even 2025-26
 export const ACADEMIC_CALENDAR = {
-    teachingEnd: new Date('2026-03-21'),
+    teachingEnd: new Date('2026-03-28'),
     midSemExams: { start: new Date('2026-03-24'), end: new Date('2026-03-31') },
     practicalExams: { start: new Date('2026-04-01'), end: new Date('2026-04-07') },
     theoryExams: { start: new Date('2026-04-08') },
