@@ -5,10 +5,12 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { fullCalculation } from '@/lib/attendance';
 import { DEFAULT_DIVISION } from '@/lib/divisions';
-import type { CalculationResult, AttendanceStatus, StrategyMode } from '@/types';
+import { DEFAULT_COLLEGE, DEFAULT_DEPARTMENT, type CalculationResult, type StrategyMode, type College, type Department } from '@/types';
 
 interface AttendanceState {
     // Form state
+    college: College;
+    department: Department;
     division: string;
     target: number;
     useDefaultTarget: boolean;
@@ -20,7 +22,9 @@ interface AttendanceState {
     // Result (ephemeral — not persisted)
     currentResult: CalculationResult | null;
 
-    // Actions
+// Actions
+    setCollege: (college: College) => void;
+    setDepartment: (department: Department) => void;
     setDivision: (division: string) => void;
     setTarget: (target: number) => void;
     setUseDefaultTarget: (use: boolean) => void;
@@ -35,8 +39,10 @@ interface AttendanceState {
 const DEFAULT_TARGET = 75;
 
 export const useAttendanceStore = create<AttendanceState>()(
-    persist(
+persist(
         (set, get) => ({
+            college: DEFAULT_COLLEGE,
+            department: DEFAULT_DEPARTMENT,
             division: DEFAULT_DIVISION,
             target: DEFAULT_TARGET,
             useDefaultTarget: true,
@@ -47,6 +53,10 @@ export const useAttendanceStore = create<AttendanceState>()(
             currentResult: null,
 
             setDivision: (division) => set({ division }),
+
+            setCollege: (college) => set({ college }),
+
+            setDepartment: (department) => set({ department }),
 
             setTarget: (target) => set({ target }),
 
@@ -116,7 +126,9 @@ export const useAttendanceStore = create<AttendanceState>()(
                 }
                 return merged;
             },
-            partialize: (state) => ({
+partialize: (state) => ({
+                college: state.college,
+                department: state.department,
                 division: state.division,
                 target: state.target,
                 useDefaultTarget: state.useDefaultTarget,

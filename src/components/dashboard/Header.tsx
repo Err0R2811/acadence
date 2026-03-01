@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAttendanceStore } from '@/stores/attendance-store';
 import { DIVISIONS } from '@/lib/divisions';
-import { STRATEGY_MODES } from '@/types';
+import { STRATEGY_MODES, COLLEGE_DEPARTMENTS, type College, type Department } from '@/types';
+
+const DEPARTMENT_DIVISIONS: Record<Department, string[]> = {
+    'CSE': ['6A1', '6A2', '6A3', '6A4', '6A5', '6A6', '6A7', '6A8', '6A9', '6A10', '6A11', '6A12', '6A13', '6A14', '6A15', '6A16', '6A17', '6A18', '6A19', '6A20', '6A21', '6A22'],
+    'AI': ['6B1', '6B2', '6B3', '6B4', '6B5', '6B6'],
+    'Cyber Security': ['6C1', '6C2'],
+    'Electric': [],
+};
 
 /** Inline SVG monogram — simplified bold A in gold */
 function AcadenceMonogram({ size = 28 }: { size?: number }) {
@@ -26,7 +33,7 @@ function AcadenceMonogram({ size = 28 }: { size?: number }) {
 }
 
 export default function Header() {
-    const { division, setDivision, target, strategyMode } = useAttendanceStore();
+    const { college, department, division, setCollege, setDepartment, setDivision, target, strategyMode } = useAttendanceStore();
     const modeInfo = STRATEGY_MODES.find((m) => m.id === strategyMode)!;
     const [scrolled, setScrolled] = useState(false);
 
@@ -95,39 +102,130 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Division, Target & Mode Row */}
-            <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
-                {/* Division Dropdown */}
-                <div className="relative">
-                    <select
-                        value={division}
-                        onChange={(e) => setDivision(e.target.value)}
-                        className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-sm font-medium cursor-pointer outline-none transition-all duration-200"
-                        style={{
-                            background: 'var(--bg-card)',
-                            border: '1px solid var(--border-color)',
-                            color: 'var(--text-primary)',
-                        }}
-                    >
-                        {DIVISIONS.map((d) => (
-                            <option key={d} value={d}>
-                                Division {d}
-                            </option>
-                        ))}
-                    </select>
-                    <svg
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        style={{ color: 'var(--text-muted)' }}
-                    >
-                        <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                </div>
+{/* College, Department, Division Row */}
+            <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+                {/* College Dropdown */}
+                {college === 'PIT' ? (
+                    <>
+                        <div className="relative">
+                            <select
+                                value={college}
+                                onChange={(e) => setCollege(e.target.value as College)}
+                                className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-sm font-medium cursor-pointer outline-none transition-all duration-200"
+                                style={{
+                                    background: 'var(--bg-card)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--text-primary)',
+                                }}
+                            >
+                                <option value="PIT">PIT</option>
+                                <option value="PIET">PIET</option>
+                            </select>
+                            <svg
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                style={{ color: 'var(--text-muted)' }}
+                            >
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </div>
+
+                        {/* Department Dropdown */}
+                        <div className="relative">
+                            <select
+                                value={department}
+                                onChange={(e) => setDepartment(e.target.value as Department)}
+                                className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-sm font-medium cursor-pointer outline-none transition-all duration-200"
+                                style={{
+                                    background: 'var(--bg-card)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--text-primary)',
+                                }}
+                            >
+                                {COLLEGE_DEPARTMENTS[college].map((d) => (
+                                    <option key={d} value={d}>{d}</option>
+                                ))}
+                            </select>
+                            <svg
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                style={{ color: 'var(--text-muted)' }}
+                            >
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </div>
+
+                        {/* Division Dropdown */}
+                        <div className="relative">
+                            <select
+                                value={division}
+                                onChange={(e) => setDivision(e.target.value)}
+                                className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-sm font-medium cursor-pointer outline-none transition-all duration-200"
+                                style={{
+                                    background: 'var(--bg-card)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--text-primary)',
+                                }}
+                            >
+                                {DEPARTMENT_DIVISIONS[department].map((d) => (
+                                    <option key={d} value={d}>
+                                        Division {d}
+                                    </option>
+                                ))}
+                            </select>
+                            <svg
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                style={{ color: 'var(--text-muted)' }}
+                            >
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </div>
+                    </>
+                ) : (
+                    <div className="relative">
+                        <select
+                            value={college}
+                            onChange={(e) => setCollege(e.target.value as College)}
+                            className="appearance-none pl-3.5 pr-8 py-2 rounded-xl text-sm font-medium cursor-pointer outline-none transition-all duration-200"
+                            style={{
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-primary)',
+                            }}
+                        >
+                            <option value="PIT">PIT</option>
+                            <option value="PIET">PIET</option>
+                        </select>
+                        <svg
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            style={{ color: 'var(--text-muted)' }}
+                        >
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+                )}
 
                 {/* Target Badge — Gold */}
                 <span

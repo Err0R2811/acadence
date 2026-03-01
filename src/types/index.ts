@@ -20,6 +20,24 @@ export interface CalculationInput {
   target: number;
 }
 
+/** College types */
+export type College = 'PIT' | 'PIET';
+
+/** Department types */
+export type Department = 'CSE' | 'AI' | 'Cyber Security' | 'Electric';
+
+/** Departments available per college */
+export const COLLEGE_DEPARTMENTS: Record<College, Department[]> = {
+  PIT: ['CSE', 'AI', 'Cyber Security'],
+  PIET: ['CSE', 'AI', 'Electric'],
+};
+
+/** Default college */
+export const DEFAULT_COLLEGE: College = 'PIT';
+
+/** Default department */
+export const DEFAULT_DEPARTMENT: Department = 'CSE';
+
 /** Calculation result stored in history */
 export interface CalculationResult {
   id: string;
