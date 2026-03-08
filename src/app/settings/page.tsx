@@ -1,13 +1,7 @@
 'use client';
 
-import type { Metadata } from 'next';
 import { useAttendanceStore } from '@/stores/attendance-store';
 import { getDivisionsBySection } from '@/lib/divisions';
-
-export const metadata: Metadata = {
-  title: "Settings — Acadence",
-  description: "Customize your Acadence experience — set your branch, division, and attendance target.",
-};
 
 const divisionGroups = getDivisionsBySection();
 
