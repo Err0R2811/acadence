@@ -1,6 +1,12 @@
 'use client';
 
+import type { Metadata } from 'next';
 import { useAttendanceStore } from '@/stores/attendance-store';
+
+export const metadata: Metadata = {
+  title: "Attendance History — Acadence",
+  description: "Track your past attendance records and progress over time.",
+};
 
 export default function HistoryPage() {
     const currentResult = useAttendanceStore((s) => s.currentResult);

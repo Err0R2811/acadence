@@ -11,20 +11,33 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://acadence-pit.vercel.app"),
   title: {
-    default: 'Acadence – Strategy Overview',
-    template: 'Acadence – %s',
+    default: "Acadence — Academic Strategy Engine",
+    template: "%s | Acadence",
   },
   description:
-    'Academic Strategy Engine — Track attendance, optimize your schedule, maximize your academic performance.',
+    "The academic strategy engine for PIT/PIET students. Track attendance, plan schedules, and hit 75%.",
   keywords: [
-    'acadence',
-    'attendance tracker',
-    'academic strategy',
-    'lecture tracker',
-    'attendance calculator',
+    "PIT attendance calculator",
+    "PIET attendance tracker",
+    "75% attendance planner",
+    "CSE attendance strategy",
+    "AI attendance tracker",
+    "Cyber Security attendance",
+    "acadence",
+    "attendance tracker",
+    "academic strategy",
+    "lecture tracker",
+    "attendance calculator",
   ],
-  authors: [{ name: 'Acadence' }],
+  authors: [{ name: "Err0r" }],
+  alternates: {
+    canonical: "https://acadence-pit.vercel.app",
+  },
+  verification: {
+    google: "_78TgF0UhO23ZKqc9s1kEcW6MDZJpiP4VEcWB1-gRX8",
+  },
   icons: {
     icon: [
       { url: '/brand/favicon.svg', type: 'image/svg+xml' },
@@ -33,9 +46,16 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   openGraph: {
-    title: 'Acadence – Academic Strategy Engine',
-    description: 'Track attendance, optimize your schedule, maximize your academic performance',
-    type: 'website',
+    title: "Acadence — Academic Strategy Engine",
+    description: "Plan your attendance strategy for PIT/PIET college. Works for CSE, AI & Cyber Security students.",
+    url: "https://acadence-pit.vercel.app",
+    siteName: "Acadence",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Acadence — Attendance Calculator for PIT/PIET",
+    description: "Hit 75% attendance with smart planning. Built for PIT/PIET students.",
   },
 };
 
@@ -108,6 +128,33 @@ export default function RootLayout({
         </div>
         <BottomNav />
         <Analytics />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "Acadence",
+              "url": "https://acadence-pit.vercel.app",
+              "description": "Attendance calculator and academic strategy engine for PIT/PIET students",
+              "applicationCategory": "EducationApplication",
+              "operatingSystem": "Web",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "INR"
+              },
+              "audience": {
+                "@type": "EducationalAudience",
+                "educationalRole": "student"
+              },
+              "creator": {
+                "@type": "Person",
+                "name": "Err0r"
+              }
+            })
+          }}
+        />
       </body>
     </html>
   );

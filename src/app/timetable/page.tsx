@@ -1,6 +1,13 @@
 'use client';
 
+import type { Metadata } from 'next';
 import { useMemo, useState } from 'react';
+
+export const metadata: Metadata = {
+  title: "Timetable — Acadence",
+  description: "View and plan your weekly timetable for PIT/PIET college. Organized by division and branch.",
+};
+
 import { useAttendanceStore } from '@/stores/attendance-store';
 import {
     getUpcomingLectures,
